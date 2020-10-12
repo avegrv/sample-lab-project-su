@@ -17,6 +17,7 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
@@ -51,6 +52,14 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             readContacts();
         } else {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 0);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            readContacts();
         }
     }
 
