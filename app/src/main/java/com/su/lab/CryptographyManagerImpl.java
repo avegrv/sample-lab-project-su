@@ -37,8 +37,9 @@ public class CryptographyManagerImpl implements CryptographyManager {
 
     @Override
     public Cipher getInitializedCipherForEncryption(String keyName) {
-        Cipher cipher = getCipher();
+        Cipher cipher = null;
         try {
+            cipher = getCipher();
             SecretKey secretKey = getOrCreateSecretKey(keyName);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         } catch (Exception e) {
@@ -49,8 +50,9 @@ public class CryptographyManagerImpl implements CryptographyManager {
 
     @Override
     public Cipher getInitializedCipherForDecryption(String keyName, byte[] initializationVector) {
-        Cipher cipher = getCipher();
+        Cipher cipher = null;
         try {
+            cipher = getCipher();
             SecretKey secretKey = getOrCreateSecretKey(keyName);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(128, initializationVector));
         } catch (Exception e) {
@@ -124,12 +126,7 @@ public class CryptographyManagerImpl implements CryptographyManager {
             NoSuchProviderException,
             InvalidAlgorithmParameterException {
         // If Secretkey was previously created for that keyName, then grab and return it.
-        KeyStore keyStore = null;
-        try {
-            keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
-        } catch (KeyStoreException e) {
-            Log.e(TAG, "KeyStoreException", e);
-        }
+        KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
         assert keyStore != null;
         keyStore.load(null); // Keystore must be loaded before it can be accessed
         Key key = keyStore.getKey(keyName, null);
@@ -148,25 +145,17 @@ public class CryptographyManagerImpl implements CryptographyManager {
                 .setUserAuthenticationRequired(false)
                 .build();
         KeyGenerator keyGenerator = KeyGenerator.getInstance(
-                KeyProperties.KEY_ALGORITHM_AES,
+                ENCRYPTION_ALGORITHM,
                 ANDROID_KEYSTORE
         );
         keyGenerator.init(keyGenParams);
         return keyGenerator.generateKey();
     }
 
-    private Cipher getCipher() {
+    private Cipher getCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
         final String transformation = ENCRYPTION_ALGORITHM
                 + "/" + ENCRYPTION_BLOCK_MODE
                 + "/" + ENCRYPTION_PADDING;
-        Cipher cipher = null;
-        try {
-            cipher = Cipher.getInstance(transformation);
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "getCipher:NoSuchAlgorithmException", e);
-        } catch (NoSuchPaddingException e) {
-            Log.e(TAG, "getCipher:NoSuchPaddingException", e);
-        }
-        return cipher;
+        return Cipher.getInstance(transformation);
     }
 }
