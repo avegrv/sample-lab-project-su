@@ -9,8 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.nio.charset.StandardCharsets;
-
 import javax.crypto.Cipher;
 
 import androidx.annotation.Nullable;
@@ -20,7 +18,7 @@ public class LoginActivity extends Activity {
     private final String SHARED_PREF = "login_prefs";
     private final String PIN_KEY = "key";
 
-    private final String CIPHER_KEY = "CIPHER_KEY";
+    private final String CIPHER_KEY = "pin_code";
 
     private final CryptographyManager cryptographyManager = new CryptographyManagerImpl();
 
