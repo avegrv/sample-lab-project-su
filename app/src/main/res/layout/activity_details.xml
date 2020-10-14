@@ -3,6 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- TODO #2 Добавить TextView и отобразить номер телефона вместе с android:id="@+id/contacts_phone_number" -->
-
+    <TextView
+        android:id="@+id/contacts_phone_number"
+        android:layout_width="0dp"
+        android:layout_height="110dp"
+        android:layout_weight="1"
+        android:gravity="center"/>
 </LinearLayout>

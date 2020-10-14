@@ -1,14 +1,17 @@
 package com.su.lab;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,6 +23,13 @@ public class DetailsActivity extends Activity implements LoaderManager.LoaderCal
 
     // Defines a constant that identifies the loader
     static int DETAILS_QUERY_ID = 0;
+
+    private void openSystemPhone(View view) {
+        String phone = ((TextView)view.findViewById(R.id.contacts_phone_number)).getText().toString();
+        Intent phoneIntent = new Intent(Intent.ACTION_DIAL);
+        phoneIntent.setData(Uri.parse("tel:" + phone));
+        startActivity(phoneIntent);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,17 +56,19 @@ public class DetailsActivity extends Activity implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         cursor.moveToPosition(0);
         final String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-        /*
-         * TODO #3 Добавить обработчик клика и добавить логику перехода в системное приложение телефона
-         */
-//        TextView phoneNumber = findViewById(R.id.contacts_phone_number);
-//        phoneNumber.setText(number);
-//        phoneNumber.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // phone click logic
-//            }
-//        });
+
+        TextView phoneNumber = findViewById(R.id.contacts_phone_number);
+        phoneNumber.setText(number);
+        phoneNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    openSystemPhone(v);
+                } else  {
+                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE},  0);
+                }
+            }
+        });
     }
 
     @Override
