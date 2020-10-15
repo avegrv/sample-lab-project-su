@@ -91,12 +91,10 @@ public class CryptographyManagerImpl implements CryptographyManager {
             int mode,
             String prefKey
     ) {
-        /*
-         *  TODO #1 Реализовать сохрание текста и IV в SharedPreferences
-         *  Для перевода byte[] в String воспользуйтесь следующим кодом
-         *  new String(%byte[]%, StandardCharsets.ISO_8859_1)
-         *  https://developer.android.com/training/data-storage/shared-preferences
-         */
+        context.getSharedPreferences(filename, mode).edit()
+                .putString(prefKey, new String(cipherTextWrapper.getCipherText(), StandardCharsets.ISO_8859_1))
+                .putString(prefKey + "_iv", new String(cipherTextWrapper.getInitializationVector(), StandardCharsets.ISO_8859_1))
+                .apply();
     }
 
     @Nullable
@@ -107,10 +105,16 @@ public class CryptographyManagerImpl implements CryptographyManager {
             int mode,
             String prefKey
     ) {
-        /*
-         *  TODO 2 Реализовать вывод CipherTextWrapper из SharedPreferences
-         */
-        return null;
+        SharedPreferences sharedPreferences = context.getSharedPreferences(filename, mode);
+        String cipherText = sharedPreferences.getString(prefKey, null);
+        String initializationVector = sharedPreferences.getString(prefKey + "_iv", null);
+        if (cipherText == null || initializationVector == null) {
+            return null;
+        }
+        return new CipherTextWrapper(
+                cipherText.getBytes(StandardCharsets.ISO_8859_1),
+                initializationVector.getBytes(StandardCharsets.ISO_8859_1)
+        );
     }
 
     private SecretKey getOrCreateSecretKey(String keyName) throws
@@ -131,10 +135,21 @@ public class CryptographyManagerImpl implements CryptographyManager {
         }
 
         // if you reach here, then a new SecretKey must be generated for that keyName
-        /*
-         * TODO 4 Реализовать генерацию ключа при помощи KeyGenerator см презентацию
-         */
-        return null;
+        KeyGenParameterSpec keyGenParams = new KeyGenParameterSpec.Builder(
+                keyName,
+                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT
+        )
+                .setBlockModes(ENCRYPTION_BLOCK_MODE)
+                .setEncryptionPaddings(ENCRYPTION_PADDING)
+                .setKeySize(KEY_SIZE)
+                .setUserAuthenticationRequired(false)
+                .build();
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(
+                ENCRYPTION_ALGORITHM,
+                ANDROID_KEYSTORE
+        );
+        keyGenerator.init(keyGenParams);
+        return keyGenerator.generateKey();
     }
 
     private Cipher getCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {

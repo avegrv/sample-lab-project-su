@@ -78,9 +78,8 @@ public class LoginActivity extends Activity {
         String decrypted = cryptographyManager.decryptData(cipherText, cipher);
         boolean isSame = decrypted.equals(password);
         if (isSame) {
-            /*
-             *  TODO 3 Открыть MainActivity через Intent
-             */
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         } else {
             Toast.makeText(this, "Wrong password", Toast.LENGTH_SHORT).show();
         }
