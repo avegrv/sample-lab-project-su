@@ -34,12 +34,12 @@ public class CryptographyManagerImpl implements CryptographyManager {
 
     @Override
     public CipherTextWrapper encryptData(String data, String keyName) {
-        return new CipherTextWrapper(data, "");
+        return new CipherTextWrapper(Base64.encodeToString(data.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT), "");
     }
 
     @Override
     public String decryptData(CipherTextWrapper wrapper, String keyName) {
-        return wrapper.getCipherText();
+        return new String(Base64.decode(wrapper.getCipherText(), Base64.DEFAULT), StandardCharsets.UTF_8);
     }
 
     private SecretKey getOrCreateSecretKey(String keyName) throws
