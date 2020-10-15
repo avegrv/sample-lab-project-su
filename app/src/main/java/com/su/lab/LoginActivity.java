@@ -8,12 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-
 import androidx.annotation.Nullable;
-
-import static com.su.lab.CryptographyManagerImpl.SHA1;
 
 public class LoginActivity extends Activity {
 
@@ -52,7 +47,7 @@ public class LoginActivity extends Activity {
         EditText editTextTextPassword = findViewById(R.id.editTextTextPassword);
         String pin = editTextTextPassword.getText().toString();
 
-        CipherTextWrapper wrapper = cryptographyManager.encryptData(pin, CIPHER_KEY);
+        CipherTextWrapper wrapper = cryptographyManager.encryptData(this, pin, CIPHER_KEY);
         storage.persistCipherTextWrapper(this, wrapper);
 
         Toast.makeText(this, "Pin created", Toast.LENGTH_SHORT).show();
@@ -72,15 +67,8 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        String decrypted = cryptographyManager.decryptData(cipherTextWrapper, CIPHER_KEY);
-        boolean isSamePassword = false;
-        try {
-            isSamePassword = decrypted.equals(SHA1(password));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        String decrypted = cryptographyManager.decryptData(this, cipherTextWrapper, CIPHER_KEY);
+        boolean isSamePassword = decrypted.equals(password);
         if (isSamePassword) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
