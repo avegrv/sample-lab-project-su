@@ -8,7 +8,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 import androidx.annotation.Nullable;
+
+import static com.su.lab.CryptographyManagerImpl.SHA1;
 
 public class LoginActivity extends Activity {
 
@@ -68,7 +73,14 @@ public class LoginActivity extends Activity {
         }
 
         String decrypted = cryptographyManager.decryptData(cipherTextWrapper, CIPHER_KEY);
-        boolean isSamePassword = decrypted.equals(password);
+        boolean isSamePassword = false;
+        try {
+            isSamePassword = decrypted.equals(SHA1(password));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         if (isSamePassword) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

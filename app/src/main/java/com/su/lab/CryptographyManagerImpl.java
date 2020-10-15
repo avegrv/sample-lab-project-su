@@ -6,11 +6,13 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
@@ -34,7 +36,41 @@ public class CryptographyManagerImpl implements CryptographyManager {
 
     @Override
     public CipherTextWrapper encryptData(String data, String keyName) {
-        return new CipherTextWrapper(Base64.encodeToString(data.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT), "");
+        try {
+            return new CipherTextWrapper(Base64.encodeToString(SHA1(data).getBytes(StandardCharsets.UTF_8), Base64.DEFAULT), "");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String convertToHex(byte[] data) {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < data.length; i++) {
+            int halfbyte = (data[i] >>> 4) & 0x0F;
+            int two_halfs = 0;
+            do {
+                if ((0 <= halfbyte) && (halfbyte <= 9)) {
+                    buf.append((char) ('0' + halfbyte));
+                }
+                else {
+                    buf.append((char) ('a' + (halfbyte - 10)));
+                }
+                halfbyte = data[i] & 0x0F;
+            } while(two_halfs++ < 1);
+        }
+        return buf.toString();
+    }
+
+
+    public static String SHA1(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] sha1hash;
+        md.update(text.getBytes(StandardCharsets.UTF_8), 0, text.length());
+        sha1hash = md.digest();
+        return convertToHex(sha1hash);
     }
 
     @Override
