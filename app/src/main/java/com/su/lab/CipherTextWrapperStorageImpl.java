@@ -1,0 +1,35 @@
+package com.su.lab;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+public class CipherTextWrapperStorageImpl implements CipherTextWrapperStorage {
+
+    private static final String SHARED_PREF_FILE_NAME = "login_prefs";
+    private static final String PIN_KEY = "pin";
+    private static final String PIN_IV_KEY = "pin_iv";
+
+    @Override
+    public void persistCipherTextWrapper(Context context, CipherTextWrapper wrapper) {
+        context.getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE).edit()
+                .putString(PIN_KEY, wrapper.getCipherText())
+                .putString(PIN_IV_KEY, wrapper.getInitializationVector())
+                .apply();
+    }
+
+    @Override
+    public CipherTextWrapper getCipherTextWrapper(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
+        String cipherText = sharedPreferences.getString(PIN_KEY, null);
+        String initializationVector = sharedPreferences.getString(PIN_IV_KEY, null);
+        if (cipherText == null || initializationVector == null) {
+            return null;
+        }
+        return new CipherTextWrapper(cipherText, initializationVector);
+    }
+
+    @Override
+    public boolean isCipherTextWrapperExist(Context context) {
+        return this.getCipherTextWrapper(context) != null;
+    }
+}

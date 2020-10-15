@@ -1,9 +1,8 @@
 package com.su.lab;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.util.Base64;
 import android.util.Log;
 
 import java.io.IOException;
@@ -23,98 +22,58 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
-import androidx.annotation.Nullable;
-
 public class CryptographyManagerImpl implements CryptographyManager {
 
     private static final String TAG = "CryptographyManagerImpl";
 
     private static final int KEY_SIZE = 256;
+    private static final int IV_SIZE = 128;
     private static final String ANDROID_KEYSTORE = "AndroidKeyStore";
     private static final String ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES;
     private static final String ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_GCM;
     private static final String ENCRYPTION_PADDING = KeyProperties.ENCRYPTION_PADDING_NONE;
 
     @Override
-    public Cipher getInitializedCipherForEncryption(String keyName) {
-        Cipher cipher = null;
+    public CipherTextWrapper encryptData(String data, String keyName) {
+        String cipherText = null;
+        String initializationVector = null;
+
         try {
-            cipher = getCipher();
+            Cipher cipher = getCipher();
             SecretKey secretKey = getOrCreateSecretKey(keyName);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+            byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+            byte[] cipherTextBytes = cipher.doFinal(dataBytes);
+            cipherText = Base64.encodeToString(cipherTextBytes, Base64.DEFAULT);
+            initializationVector = Base64.encodeToString(cipher.getIV(), Base64.DEFAULT);
         } catch (Exception e) {
-            Log.e(TAG, "getInitializedCipherForEncryption", e);
+            Log.e(TAG, "encryptData", e);
         }
-        return cipher;
+        return new CipherTextWrapper(cipherText, initializationVector);
     }
 
     @Override
-    public Cipher getInitializedCipherForDecryption(String keyName, byte[] initializationVector) {
-        Cipher cipher = null;
+    public String decryptData(CipherTextWrapper wrapper, String keyName) {
+        String cipherText = wrapper.getCipherText();
+        String initializationVector = wrapper.getInitializationVector();
+
+        byte[] cipherTextBytes = Base64.decode(cipherText, Base64.DEFAULT);
+        byte[] initializationVectorBytes = Base64.decode(initializationVector, Base64.DEFAULT);
+
+        String data = null;
         try {
-            cipher = getCipher();
+            Cipher cipher = getCipher();
             SecretKey secretKey = getOrCreateSecretKey(keyName);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(128, initializationVector));
+            GCMParameterSpec ivParams = new GCMParameterSpec(IV_SIZE, initializationVectorBytes);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParams);
+
+            byte[] dataBytes = cipher.doFinal(cipherTextBytes);
+            data = new String(dataBytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            Log.e(TAG, "getInitializedCipherForEncryption", e);
+            Log.e(TAG, "decryptData", e);
         }
-        return cipher;
-    }
-
-    @Override
-    public CipherTextWrapper encryptData(String plaintext, Cipher cipher) {
-        byte[] cipherText = null;
-        try {
-            cipherText = cipher.doFinal(plaintext.getBytes(StandardCharsets.ISO_8859_1));
-        } catch (Exception e) {
-            Log.e(TAG, "encryptData", e);
-        }
-        return new CipherTextWrapper(cipherText, cipher.getIV());
-    }
-
-    @Override
-    public String decryptData(byte[] cipherText, Cipher cipher) {
-        byte[] plaintext = null;
-        try {
-            plaintext = cipher.doFinal(cipherText);
-        } catch (Exception e) {
-            Log.e(TAG, "encryptData", e);
-        }
-        return new String(plaintext, StandardCharsets.ISO_8859_1);
-    }
-
-    @Override
-    public void persistCipherTextWrapperToSharedPrefs(
-            CipherTextWrapper cipherTextWrapper,
-            Context context,
-            String filename,
-            int mode,
-            String prefKey
-    ) {
-        context.getSharedPreferences(filename, mode).edit()
-                .putString(prefKey, new String(cipherTextWrapper.getCipherText(), StandardCharsets.ISO_8859_1))
-                .putString(prefKey + "_iv", new String(cipherTextWrapper.getInitializationVector(), StandardCharsets.ISO_8859_1))
-                .apply();
-    }
-
-    @Nullable
-    @Override
-    public CipherTextWrapper getCipherTextWrapperFromSharedPrefs(
-            Context context,
-            String filename,
-            int mode,
-            String prefKey
-    ) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(filename, mode);
-        String cipherText = sharedPreferences.getString(prefKey, null);
-        String initializationVector = sharedPreferences.getString(prefKey + "_iv", null);
-        if (cipherText == null || initializationVector == null) {
-            return null;
-        }
-        return new CipherTextWrapper(
-                cipherText.getBytes(StandardCharsets.ISO_8859_1),
-                initializationVector.getBytes(StandardCharsets.ISO_8859_1)
-        );
+        return data;
     }
 
     private SecretKey getOrCreateSecretKey(String keyName) throws

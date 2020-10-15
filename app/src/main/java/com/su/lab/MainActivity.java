@@ -20,9 +20,9 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
 
-    private final static int READ_CONTACTS_PERMISSION_CODE = 123;
+    private static final int READ_CONTACTS_PERMISSION_CODE = 123;
 
-    private final static String[] FROM_COLUMNS = {
+    private static final String[] FROM_COLUMNS = {
             ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
     };
 
@@ -31,7 +31,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
     };
 
-    private final static int[] TO_IDS = {
+    private static final int[] TO_IDS = {
             android.R.id.text1
     };
 
@@ -62,14 +62,6 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             readContacts();
         } else {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, READ_CONTACTS_PERMISSION_CODE);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            readContacts();
         }
     }
 

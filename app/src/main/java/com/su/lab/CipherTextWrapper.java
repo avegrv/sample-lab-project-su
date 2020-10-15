@@ -2,28 +2,19 @@ package com.su.lab;
 
 public class CipherTextWrapper {
 
-    private byte[] cipherText;
-    private byte[] initializationVector;
+    private String cipherText;
+    private String initializationVector;
 
-
-    public CipherTextWrapper(byte[] cipherText, byte[] initializationVector) {
+    public CipherTextWrapper(String cipherText, String initializationVector) {
         this.cipherText = cipherText;
         this.initializationVector = initializationVector;
     }
 
-    public byte[] getCipherText() {
+    public String getCipherText() {
         return cipherText;
     }
 
-    public void setCipherText(byte[] cipherText) {
-        this.cipherText = cipherText;
-    }
-
-    public byte[] getInitializationVector() {
+    public String getInitializationVector() {
         return initializationVector;
-    }
-
-    public void setInitializationVector(byte[] initializationVector) {
-        this.initializationVector = initializationVector;
     }
 }

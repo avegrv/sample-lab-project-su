@@ -1,7 +1,6 @@
 package com.su.lab;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,18 +8,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import javax.crypto.Cipher;
-
 import androidx.annotation.Nullable;
 
 public class LoginActivity extends Activity {
 
-    private final String SHARED_PREF = "login_prefs";
-    private final String PIN_KEY = "key";
-
     private final String CIPHER_KEY = "pin_code";
 
     private final CryptographyManager cryptographyManager = new CryptographyManagerImpl();
+    private final CipherTextWrapperStorage storage = new CipherTextWrapperStorageImpl();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,7 +24,7 @@ public class LoginActivity extends Activity {
 
         Button button = findViewById(R.id.button);
 
-        boolean isPinExist = isPinExist();
+        boolean isPinExist = storage.isCipherTextWrapperExist(this);
         button.setText(isPinExist ? R.string.login_button_enter : R.string.login_button_create_pin);
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -41,7 +36,7 @@ public class LoginActivity extends Activity {
     }
 
     private void onNextClicked() {
-        if (isPinExist()) {
+        if (storage.isCipherTextWrapperExist(this)) {
             checkPin();
         } else {
             createPin();
@@ -52,11 +47,11 @@ public class LoginActivity extends Activity {
         EditText editTextTextPassword = findViewById(R.id.editTextTextPassword);
         String pin = editTextTextPassword.getText().toString();
 
-        Cipher cipher = cryptographyManager.getInitializedCipherForEncryption(CIPHER_KEY);
-        CipherTextWrapper encrypted = cryptographyManager.encryptData(pin, cipher);
-        cryptographyManager.persistCipherTextWrapperToSharedPrefs(encrypted, this,
-                SHARED_PREF, Context.MODE_PRIVATE, PIN_KEY);
+        CipherTextWrapper wrapper = cryptographyManager.encryptData(pin, CIPHER_KEY);
+        storage.persistCipherTextWrapper(this, wrapper);
+
         Toast.makeText(this, "Pin created", Toast.LENGTH_SHORT).show();
+
         editTextTextPassword.setText(null);
         Button button = findViewById(R.id.button);
         button.setText(R.string.login_button_enter);
@@ -66,27 +61,19 @@ public class LoginActivity extends Activity {
         EditText editTextTextPassword = findViewById(R.id.editTextTextPassword);
         String password = editTextTextPassword.getText().toString();
 
-        CipherTextWrapper cipherTextWrapper = cryptographyManager.getCipherTextWrapperFromSharedPrefs(
-                this, SHARED_PREF, Context.MODE_PRIVATE, PIN_KEY);
+        CipherTextWrapper cipherTextWrapper = storage.getCipherTextWrapper(this);
         if (cipherTextWrapper == null) {
             Toast.makeText(this, "Setup pin first", Toast.LENGTH_SHORT).show();
             return;
         }
-        byte[] cipherText = cipherTextWrapper.getCipherText();
-        byte[] iv = cipherTextWrapper.getInitializationVector();
-        Cipher cipher = cryptographyManager.getInitializedCipherForDecryption(CIPHER_KEY, iv);
-        String decrypted = cryptographyManager.decryptData(cipherText, cipher);
-        boolean isSame = decrypted.equals(password);
-        if (isSame) {
+
+        String decrypted = cryptographyManager.decryptData(cipherTextWrapper, CIPHER_KEY);
+        boolean isSamePassword = decrypted.equals(password);
+        if (isSamePassword) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         } else {
             Toast.makeText(this, "Wrong password", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private boolean isPinExist() {
-        return cryptographyManager.getCipherTextWrapperFromSharedPrefs(
-                this, SHARED_PREF, Context.MODE_PRIVATE, PIN_KEY) != null;
     }
 }
