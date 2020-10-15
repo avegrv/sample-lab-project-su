@@ -46,13 +46,15 @@ public class DetailsActivity extends Activity implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         cursor.moveToPosition(0);
         final String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-        // TODO set up phone number
+        /*
+         * TODO #3 Добавить обработчик клика и добавить логику перехода в системное приложение телефона
+         */
 //        TextView phoneNumber = findViewById(R.id.contacts_phone_number);
 //        phoneNumber.setText(number);
 //        phoneNumber.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                // TODO: open phone app
+//                // phone click logic
 //            }
 //        });
     }

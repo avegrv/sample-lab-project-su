@@ -4,11 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
@@ -22,13 +20,14 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
 
+    private final static int READ_CONTACTS_PERMISSION_CODE = 123;
+
     private final static String[] FROM_COLUMNS = {
             ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
     };
 
     private static final String[] PROJECTION = {
             ContactsContract.Contacts._ID,
-            ContactsContract.Contacts.LOOKUP_KEY,
             ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
     };
 
@@ -47,11 +46,22 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         checkReadContactsPermission();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == READ_CONTACTS_PERMISSION_CODE) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                readContacts();
+            }
+        }
+    }
+
     private void checkReadContactsPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             readContacts();
         } else {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 0);
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, READ_CONTACTS_PERMISSION_CODE);
         }
     }
 
@@ -113,6 +123,10 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     }
 
     private void openDetailsActivity(long contactId) {
-        // TODO open DetailsActivity
+        /*
+         * TODO #1 Реализовать открытие DetailsActivity через Intent
+         *  https://developer.android.com/training/basics/firstapp/starting-activity
+         *  и передать contactId через extra
+         */
     }
 }
