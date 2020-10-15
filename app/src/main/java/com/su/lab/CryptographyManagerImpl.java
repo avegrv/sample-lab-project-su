@@ -34,45 +34,12 @@ public class CryptographyManagerImpl implements CryptographyManager {
 
     @Override
     public CipherTextWrapper encryptData(String data, String keyName) {
-        String cipherText = null;
-        String initializationVector = null;
-
-        try {
-            Cipher cipher = getCipher();
-            SecretKey secretKey = getOrCreateSecretKey(keyName);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-
-            byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
-            byte[] cipherTextBytes = cipher.doFinal(dataBytes);
-            cipherText = Base64.encodeToString(cipherTextBytes, Base64.DEFAULT);
-            initializationVector = Base64.encodeToString(cipher.getIV(), Base64.DEFAULT);
-        } catch (Exception e) {
-            Log.e(TAG, "encryptData", e);
-        }
-        return new CipherTextWrapper(cipherText, initializationVector);
+        return new CipherTextWrapper(data, "");
     }
 
     @Override
     public String decryptData(CipherTextWrapper wrapper, String keyName) {
-        String cipherText = wrapper.getCipherText();
-        String initializationVector = wrapper.getInitializationVector();
-
-        byte[] cipherTextBytes = Base64.decode(cipherText, Base64.DEFAULT);
-        byte[] initializationVectorBytes = Base64.decode(initializationVector, Base64.DEFAULT);
-
-        String data = null;
-        try {
-            Cipher cipher = getCipher();
-            SecretKey secretKey = getOrCreateSecretKey(keyName);
-            GCMParameterSpec ivParams = new GCMParameterSpec(128, initializationVectorBytes);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParams);
-
-            byte[] dataBytes = cipher.doFinal(cipherTextBytes);
-            data = new String(dataBytes, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            Log.e(TAG, "decryptData", e);
-        }
-        return data;
+        return wrapper.getCipherText();
     }
 
     private SecretKey getOrCreateSecretKey(String keyName) throws
