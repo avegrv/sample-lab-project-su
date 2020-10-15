@@ -27,7 +27,6 @@ public class CryptographyManagerImpl implements CryptographyManager {
     private static final String TAG = "CryptographyManagerImpl";
 
     private static final int KEY_SIZE = 256;
-    private static final int IV_SIZE = 128;
     private static final String ANDROID_KEYSTORE = "AndroidKeyStore";
     private static final String ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES;
     private static final String ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_GCM;
@@ -65,7 +64,7 @@ public class CryptographyManagerImpl implements CryptographyManager {
         try {
             Cipher cipher = getCipher();
             SecretKey secretKey = getOrCreateSecretKey(keyName);
-            GCMParameterSpec ivParams = new GCMParameterSpec(IV_SIZE, initializationVectorBytes);
+            GCMParameterSpec ivParams = new GCMParameterSpec(128, initializationVectorBytes);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParams);
 
             byte[] dataBytes = cipher.doFinal(cipherTextBytes);
