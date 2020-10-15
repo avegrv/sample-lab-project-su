@@ -40,14 +40,15 @@ public class CryptographyManagerImpl implements CryptographyManager {
     private static final String secretKeyInstance = "PBKDF2WithHmacSHA1";
     private static final String AESSalt = "exampleSalt";
     private static final String initializationVector = "8119745113154120";
+    private static final String key = "fqIhyykbTjNQ2QdQlBOISw==";
 
 
     @Override
-    public CipherTextWrapper encryptData(Context context, String data, String keyName) {
+    public CipherTextWrapper encryptData(String data) {
         String cipherText = null;
 
         try {
-            cipherText = encrypt(context.getString(R.string.key), data);
+            cipherText = encrypt(key, data);
         } catch (Exception e) {
             Log.e(TAG, "encryptData", e);
         }
@@ -55,11 +56,11 @@ public class CryptographyManagerImpl implements CryptographyManager {
     }
 
     @Override
-    public String decryptData(Context context, CipherTextWrapper wrapper, String keyName) {
+    public String decryptData(CipherTextWrapper wrapper) {
         String cipherText = wrapper.getCipherText();
         String data = null;
         try {
-            data = decrypt(context.getString(R.string.key), cipherText);
+            data = decrypt(key, cipherText);
         } catch (Exception e) {
             Log.e(TAG, "decryptData", e);
         }
@@ -85,10 +86,10 @@ public class CryptographyManagerImpl implements CryptographyManager {
         return new String(decrypted, "UTF-8");
     }
 
-    private static byte[] getRaw(String plainText, String salt) {
+    private static byte[] getRaw(String key, String salt) {
         try {
             SecretKeyFactory factory = SecretKeyFactory.getInstance(secretKeyInstance);
-            KeySpec spec = new PBEKeySpec(plainText.toCharArray(), salt.getBytes(), pswdIterations, keySize);
+            KeySpec spec = new PBEKeySpec(key.toCharArray(), salt.getBytes(), pswdIterations, keySize);
             return factory.generateSecret(spec).getEncoded();
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();

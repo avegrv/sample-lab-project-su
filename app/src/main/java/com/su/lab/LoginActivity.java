@@ -47,7 +47,7 @@ public class LoginActivity extends Activity {
         EditText editTextTextPassword = findViewById(R.id.editTextTextPassword);
         String pin = editTextTextPassword.getText().toString();
 
-        CipherTextWrapper wrapper = cryptographyManager.encryptData(this, pin, CIPHER_KEY);
+        CipherTextWrapper wrapper = cryptographyManager.encryptData(pin);
         storage.persistCipherTextWrapper(this, wrapper);
 
         Toast.makeText(this, "Pin created", Toast.LENGTH_SHORT).show();
@@ -67,7 +67,7 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        String decrypted = cryptographyManager.decryptData(this, cipherTextWrapper, CIPHER_KEY);
+        String decrypted = cryptographyManager.decryptData(cipherTextWrapper);
         boolean isSamePassword = decrypted.equals(password);
         if (isSamePassword) {
             Intent intent = new Intent(this, MainActivity.class);

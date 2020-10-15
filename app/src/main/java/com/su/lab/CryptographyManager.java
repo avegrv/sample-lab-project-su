@@ -1,10 +1,8 @@
 package com.su.lab;
 
-import android.content.Context;
-
 interface CryptographyManager {
 
-    CipherTextWrapper encryptData(Context context, String data, String keyName);
+    CipherTextWrapper encryptData(String data);
 
-    String decryptData(Context context, CipherTextWrapper wrapper, String keyName);
+    String decryptData(CipherTextWrapper wrapper);
 }
