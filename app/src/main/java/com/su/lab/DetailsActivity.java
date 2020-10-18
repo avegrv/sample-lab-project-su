@@ -46,19 +46,17 @@ public class DetailsActivity extends Activity implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         cursor.moveToPosition(0);
         final String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-        /*
-         * TODO #5 раскомментировать и проверить переход в системное приложение телефона
-         */
-//        TextView phoneNumber = findViewById(R.id.contacts_phone_number);
-//        phoneNumber.setText(number);
-//        phoneNumber.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(Intent.ACTION_DIAL);
-//                intent.setData(Uri.parse("tel:" + number));
-//                startActivity(intent);
-//            }
-//        });
+
+        TextView phoneNumber = findViewById(R.id.contacts_phone_number);
+        phoneNumber.setText(number);
+        phoneNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + number));
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
