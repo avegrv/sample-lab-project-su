@@ -19,8 +19,8 @@ public class CipherTextWrapperStorageImpl implements CipherTextWrapperStorage {
          */
         SharedPreferences settings = context.getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString( PIN_KEY, wrapper.getCipherText());
-        editor.putString( PIN_IV_KEY, wrapper.getInitializationVector());
+        editor.putString(PIN_KEY, wrapper.getCipherText());
+        editor.putString(PIN_IV_KEY, wrapper.getInitializationVector());
         editor.commit();
     }
 
