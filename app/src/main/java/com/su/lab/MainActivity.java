@@ -122,8 +122,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
          *  и передать contactId через extra
          */
         Intent intent = new Intent(this, DetailsActivity.class);
-        long message = contactId;
-        intent.putExtra(DetailsActivity.CONTACT_ID_EXTRA, message);
+        intent.putExtra(DetailsActivity.CONTACT_ID_EXTRA, contactId);
         startActivity(intent);
     }
 }
