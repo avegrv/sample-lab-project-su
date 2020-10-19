@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -120,5 +121,9 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
          *  https://developer.android.com/training/basics/firstapp/starting-activity
          *  и передать contactId через extra
          */
+        Intent intent = new Intent(this, DetailsActivity.class);
+        long message = contactId;
+        intent.putExtra(DetailsActivity.CONTACT_ID_EXTRA, message);
+        startActivity(intent);
     }
 }

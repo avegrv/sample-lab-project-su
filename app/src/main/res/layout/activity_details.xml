@@ -5,4 +5,10 @@
 
     <!-- TODO #4 Добавить TextView и отобразить номер телефона вместе с android:id="@+id/contacts_phone_number" -->
 
+    <TextView
+        android:id="@+id/contacts_phone_number"
+        android:layout_width="wrap_content"
+        android:layout_height="39dp"
+        android:layout_weight="1"
+        android:text="TextView" />
 </LinearLayout>
