@@ -12,8 +12,6 @@ import androidx.annotation.Nullable;
 
 public class LoginActivity extends Activity {
 
-    private final String CIPHER_KEY = "pin_code";
-
     private final CryptographyManager cryptographyManager = new CryptographyManagerImpl();
     private final CipherTextWrapperStorage storage = new CipherTextWrapperStorageImpl();
 
