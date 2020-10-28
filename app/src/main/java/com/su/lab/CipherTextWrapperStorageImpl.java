@@ -1,6 +1,7 @@
 package com.su.lab;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 public class CipherTextWrapperStorageImpl implements CipherTextWrapperStorage {
 
@@ -10,24 +11,18 @@ public class CipherTextWrapperStorageImpl implements CipherTextWrapperStorage {
 
     @Override
     public void persistCipherTextWrapper(Context context, CipherTextWrapper wrapper) {
-        /*
-         *  TODO #1 Реализовать сохрание шифр. текста cipherText и вектора инициализации initializationVector
-         *    из CipherTextWrapper в SharedPreferences, используя ключи PIN_KEY и PIN_IV_KEY
-         *  https://www.fandroid.info/sharedpreferences-sohranenie-dannyh-v-postoyannoe-hranilishhe-android/
-         *
-         */
+        SharedPreferences settings = context.getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(PIN_KEY, wrapper.getCipherText() );
+        editor.putString(PIN_IV_KEY, wrapper.getInitializationVector() );
+        editor.apply();
     }
 
     @Override
     public CipherTextWrapper getCipherTextWrapper(Context context) {
-        String cipherText = null;
-        String initializationVector = null;
-        /*
-         *  TODO #2 Реализовать получение шифр. текста cipherText и вектора инициализации initializationVector
-         *    из SharedPreferences, используя ключи PIN_KEY и PIN_IV_KEY, название файла SharedPreference SHARED_PREF_FILE_NAME
-         *    https://www.fandroid.info/sharedpreferences-sohranenie-dannyh-v-postoyannoe-hranilishhe-android/
-         *
-         */
+        SharedPreferences settings = context.getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
+        String cipherText = settings.getString(PIN_KEY, null);
+        String initializationVector = settings.getString(PIN_IV_KEY, null);;
         if (cipherText == null || initializationVector == null) {
             return null;
         }

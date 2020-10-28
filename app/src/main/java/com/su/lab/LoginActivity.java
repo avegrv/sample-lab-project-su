@@ -1,6 +1,7 @@
 package com.su.lab;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -69,10 +70,8 @@ public class LoginActivity extends Activity {
         String decrypted = cryptographyManager.decryptData(cipherTextWrapper, CIPHER_KEY);
         boolean isSamePassword = decrypted.equals(password);
         if (isSamePassword) {
-            /*
-             *  TODO #3 Открыть MainActivity через Intent
-             *   http://developer.alexanderklimov.ru/android/theory/intent.php
-             */
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         } else {
             Toast.makeText(this, "Wrong password", Toast.LENGTH_SHORT).show();
         }
