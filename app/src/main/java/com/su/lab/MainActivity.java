@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
@@ -16,6 +18,8 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import androidx.core.content.ContextCompat;
+
+import static com.su.lab.DetailsActivity.CONTACT_ID_EXTRA;
 
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
 
@@ -48,7 +52,9 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             readContacts();
         } else {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 0);
+            }
         }
     }
 
@@ -102,10 +108,8 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     }
 
     private void openDetailsActivity(long contactId) {
-        /*
-         * TODO #1 Реализовать открытие DetailsActivity через Intent
-         *  https://developer.android.com/training/basics/firstapp/starting-activity
-         *  и передать contactId через extra
-         */
+        Intent intent = new Intent(this, DetailsActivity.class);
+        intent.putExtra(CONTACT_ID_EXTRA, contactId);
+        startActivity(intent);
     }
 }
