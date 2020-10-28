@@ -46,8 +46,9 @@ public class DetailsActivity extends Activity implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         cursor.moveToPosition(0);
         final String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+        final String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
         TextView phoneNumber = findViewById(R.id.contacts_phone_number);
-        phoneNumber.setText(number);
+        phoneNumber.setText(name + ": " + number);
         phoneNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
