@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -120,5 +121,8 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
          *  https://developer.android.com/training/basics/firstapp/starting-activity
          *  и передать contactId через extra
          */
+        Intent intent = new Intent(this, DetailsActivity.class);
+        intent.putExtra(DetailsActivity.CONTACT_ID_EXTRA, contactId);
+        startActivity(intent);
     }
 }

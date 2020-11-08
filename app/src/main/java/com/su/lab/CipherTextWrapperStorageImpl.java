@@ -17,6 +17,11 @@ public class CipherTextWrapperStorageImpl implements CipherTextWrapperStorage {
          *  https://www.fandroid.info/sharedpreferences-sohranenie-dannyh-v-postoyannoe-hranilishhe-android/
          *
          */
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(PIN_KEY, wrapper.getCipherText());
+        editor.putString(PIN_IV_KEY, wrapper.getInitializationVector());
+        editor.commit();
     }
 
     @Override
